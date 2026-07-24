@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# shellcheck source=observability/versions.env
 source observability/versions.env
 
 for command in helm kubectl openssl; do

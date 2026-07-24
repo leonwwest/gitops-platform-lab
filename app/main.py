@@ -91,6 +91,25 @@ def route_label(request: Request) -> str:
     return getattr(route, "path", request.url.path)
 
 
+def record_request_result(
+    request: Request,
+    request_id: str,
+    status: int,
+    duration: float,
+) -> dict[str, str | int | float | None]:
+    path = route_label(request)
+    REQUESTS.labels(request.method, path, str(status)).inc()
+    REQUEST_DURATION.labels(request.method, path).observe(duration)
+    return {
+        "request_id": request_id,
+        "trace_id": current_trace_id(),
+        "method": request.method,
+        "path": path,
+        "status": status,
+        "duration_ms": round(duration * 1000, 2),
+    }
+
+
 @app.middleware("http")
 async def observe_request(request: Request, call_next):
     request_id = request.headers.get("x-request-id", str(uuid4()))
@@ -100,37 +119,22 @@ async def observe_request(request: Request, call_next):
         response = await call_next(request)
     except Exception:
         duration = time.perf_counter() - started
-        path = route_label(request)
-        REQUESTS.labels(request.method, path, "500").inc()
-        REQUEST_DURATION.labels(request.method, path).observe(duration)
         logger.exception(
             "request failed",
-            extra={
-                "request_id": request_id,
-                "trace_id": current_trace_id(),
-                "method": request.method,
-                "path": path,
-                "status": 500,
-                "duration_ms": round(duration * 1000, 2),
-            },
+            extra=record_request_result(request, request_id, 500, duration),
         )
         raise
 
     duration = time.perf_counter() - started
-    path = route_label(request)
-    REQUESTS.labels(request.method, path, str(response.status_code)).inc()
-    REQUEST_DURATION.labels(request.method, path).observe(duration)
     response.headers["x-request-id"] = request_id
     logger.info(
         "request completed",
-        extra={
-            "request_id": request_id,
-            "trace_id": current_trace_id(),
-            "method": request.method,
-            "path": path,
-            "status": response.status_code,
-            "duration_ms": round(duration * 1000, 2),
-        },
+        extra=record_request_result(
+            request,
+            request_id,
+            response.status_code,
+            duration,
+        ),
     )
     return response
 

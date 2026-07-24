@@ -22,7 +22,7 @@ Injection is guarded and cannot run from the Make target without explicit confir
 CONFIRM_FAILURE_EXERCISE=YES make failure-inject
 ```
 
-The script temporarily disables automated reconciliation and applies the version-controlled failure overlay. A request to `/api/v1/work` must return HTTP 503.
+The script points the Argo CD Application at the version-controlled failure overlay. Automated reconciliation stays enabled, and Argo CD—not the script—changes the Demo Service. The command waits for `Synced / Healthy` with `APP_ENV=failure`; a request to `/api/v1/work` must then return HTTP 503.
 
 ## Observe
 
@@ -40,7 +40,7 @@ Check:
 2. **Metrics:** `demo_http_requests_total{status="503"}` rises.
 3. **Logs:** Loki shows `status=503`, request ID and duration.
 4. **Traces:** Jaeger shows spans for the work endpoint.
-5. **GitOps:** Argo CD shows `OutOfSync`, because Running State differs from Git.
+5. **GitOps:** Argo CD shows the `deploy/overlays/failure` source as `Synced / Healthy`. The degraded behaviour is intentional Desired State for this guarded drill.
 
 This distinguishes service degradation from a platform outage.
 
@@ -53,7 +53,7 @@ kubectl -n platform-lab logs deployment/demo-service --tail=20
 make failure-status
 ```
 
-Expected cause: the controlled overlay changed `APP_ENV` from the Git value `local` to `failure` in Running State.
+Expected cause: the Argo CD Application selected the version-controlled failure overlay, which changed `APP_ENV` from `local` to `failure`.
 
 ## Recover
 
@@ -61,7 +61,7 @@ Expected cause: the controlled overlay changed `APP_ENV` from the Git value `loc
 make failure-recover
 ```
 
-Recovery reapplies the version-controlled Argo CD Application, restores automated reconciliation and waits until:
+Recovery reapplies the version-controlled healthy Argo CD Application and waits until:
 
 - Application status is `Synced`
 - Application health is `Healthy`

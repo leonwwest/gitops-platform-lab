@@ -17,6 +17,7 @@ The workload is deliberately small. The value of the project is the **operating 
 - Prometheus, Grafana, Loki, Grafana Alloy and Jaeger with pinned Helm chart versions
 - A guarded incident exercise and recovery by returning to Git Desired State
 - GitHub Actions with read-only permissions and immutable action references
+- A locked Python dependency graph, digest-pinned base image and documented tested toolchain
 
 ## Architecture
 
@@ -46,26 +47,37 @@ The important boundary is intentional: CI validates and builds, while Argo CD de
 ### Prerequisites on macOS
 
 ```bash
-brew install docker colima k3d kubectl helm argocd
+brew install python@3.12 docker colima k3d kubectl helm argocd
 colima start --cpu 4 --memory 8
 ```
 
-### 1. Verify code and manifests
+Exact versions used for the recorded verification are listed in [Tested toolchain](docs/tested-toolchain.md).
+
+### 1. Verify a fresh clone
 
 ```bash
-make setup
 make verify
 make container-verify
 ```
 
-### 2. Run directly on k3d
+`make verify` creates the Python 3.12 virtual environment, installs the locked dependency graph, lints the code, renders every Kustomize overlay and runs the public HTTP/manifest tests.
+
+### 2. Bootstrap the complete Platform Lab
+
+```bash
+make platform-up
+```
+
+This one command verifies the code and manifests, creates the k3d cluster, builds and imports the image, installs Argo CD, reconciles the Git Desired State, installs the observability stack and proves metrics, logs, traces and Grafana health.
+
+### 3. Optional: compare an imperative bootstrap
 
 ```bash
 make local-up
 curl http://127.0.0.1:8080/api/v1/info
 ```
 
-### 3. Turn the cluster into a GitOps environment
+`make local-up` is a deliberately isolated teaching step that applies the local overlay directly. Use `make gitops-up` to move that cluster to the normal GitOps operating model:
 
 ```bash
 make gitops-up
@@ -74,7 +86,7 @@ make gitops-status
 
 Argo CD now reconciles `deploy/overlays/local` from this repository. A manual change to a managed Deployment is detected and corrected.
 
-### 4. Install and verify observability
+### 4. Verify observability separately
 
 ```bash
 make observability-up
@@ -147,7 +159,7 @@ docs/                   Architecture, ADRs and interview notes
 
 Verified locally on **24 July 2026** on Apple Silicon:
 
-- `make verify`: 19 behaviour and contract tests, Ruff lint and format, Kustomize render
+- `make verify`: 10 public HTTP and rendered-manifest tests, Ruff lint and format, Kustomize render
 - `make container-verify`: image ran as UID 10001 and passed HTTP checks
 - `make local-up`: k3d Deployment became `1/1` Available and passed runtime smoke tests
 - Argo CD: Application became `Synced / Healthy`; manual replica drift was restored from 2 to 1
@@ -175,6 +187,7 @@ These trade-offs keep the Platform Lab runnable on one laptop while preserving t
 - [Failure Exercise runbook](docs/runbooks/failure-exercise.md)
 - [Interview cheat sheet](docs/interview-cheat-sheet.md)
 - [Domain glossary](CONTEXT.md)
+- [Tested toolchain and dependency pinning](docs/tested-toolchain.md)
 
 ## Sources
 

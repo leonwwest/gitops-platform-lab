@@ -28,17 +28,15 @@ jobs:
           cache-dependency-path: |
             requirements.txt
             requirements-dev.txt
+            constraints.lock.txt
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@c0c8b32d33a5244f1e5947304550403b63930415 # v4
         with:
           version: v1.33.3
 
-      - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
-
       - name: Verify service
-        run: make verify PYTHON=python
+        run: make verify VENV_PYTHON=python
 
   image:
     runs-on: ubuntu-latest

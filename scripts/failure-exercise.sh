@@ -9,10 +9,12 @@ base_url="${BASE_URL:-http://127.0.0.1:8080}"
 application_status() {
   kubectl get application/"${application}" \
     --namespace argocd \
-    --output=custom-columns=NAME:.metadata.name,SYNC:.status.sync.status,HEALTH:.status.health.status,REVISION:.status.sync.revision
+    --output=custom-columns=NAME:.metadata.name,PATH:.spec.source.path,SYNC:.status.sync.status,HEALTH:.status.health.status,REVISION:.status.sync.revision
 }
 
-wait_for_git_state() {
+wait_for_application_state() {
+  local expected_environment="$1"
+  local expected_path="$2"
   local deadline=$((SECONDS + 300))
   while ((SECONDS < deadline)); do
     sync="$(
@@ -31,7 +33,15 @@ wait_for_git_state() {
         --output=jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="APP_ENV")].value}' \
         2>/dev/null || true
     )"
-    if [[ "${sync}" == "Synced" && "${health}" == "Healthy" && "${app_environment}" == "local" ]]; then
+    source_path="$(
+      kubectl get application/"${application}" \
+        --namespace argocd \
+        --output=jsonpath='{.spec.source.path}' 2>/dev/null || true
+    )"
+    if [[ "${sync}" == "Synced" \
+      && "${health}" == "Healthy" \
+      && "${app_environment}" == "${expected_environment}" \
+      && "${source_path}" == "${expected_path}" ]]; then
       return 0
     fi
     sleep 5
@@ -52,15 +62,12 @@ case "${action}" in
     kubectl patch application/"${application}" \
       --namespace argocd \
       --type=merge \
-      --patch='{"spec":{"syncPolicy":{"automated":null}}}'
-    kubectl apply \
-      --server-side \
-      --force-conflicts \
-      --field-manager=failure-exercise \
-      --kustomize deploy/overlays/failure
-    kubectl rollout status deployment/demo-service \
-      --namespace "${namespace}" \
-      --timeout=180s
+      --patch='{"spec":{"source":{"path":"deploy/overlays/failure"}}}'
+    kubectl annotate application/"${application}" \
+      --namespace argocd \
+      argocd.argoproj.io/refresh=hard \
+      --overwrite
+    wait_for_application_state "failure" "deploy/overlays/failure"
 
     status="$(
       curl --silent --output .local/failure-response.json --write-out "%{http_code}" \
@@ -77,7 +84,7 @@ case "${action}" in
       --namespace argocd \
       argocd.argoproj.io/refresh=hard \
       --overwrite
-    wait_for_git_state
+    wait_for_application_state "local" "deploy/overlays/local"
     ./scripts/smoke-test.sh
     echo "Recovery complete: Git Desired State is Synced and Healthy."
     ;;
