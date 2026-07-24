@@ -4,6 +4,7 @@ set -euo pipefail
 cluster="${CLUSTER_NAME:-gitops-platform-lab}"
 image="${IMAGE:-gitops-platform-lab-demo:local}"
 k3s_image="${K3S_IMAGE:-rancher/k3s:v1.35.5-k3s1}"
+apply_mode="${APPLY_MODE:-direct}"
 context="k3d-${cluster}"
 
 for command in docker k3d kubectl curl; do
@@ -31,14 +32,21 @@ docker build --tag "${image}" .
 k3d image import "${image}" --cluster "${cluster}"
 
 kubectl config use-context "${context}" >/dev/null
-kubectl apply --server-side --field-manager=platform-lab-bootstrap \
-  --kustomize deploy/overlays/local
-kubectl rollout restart deployment/demo-service --namespace platform-lab
-kubectl rollout status deployment/demo-service \
-  --namespace platform-lab \
-  --timeout=180s
 
-BASE_URL="${BASE_URL:-http://127.0.0.1:8080}" ./scripts/smoke-test.sh
+if [[ "${apply_mode}" == "direct" ]]; then
+  kubectl apply --server-side --field-manager=platform-lab-bootstrap \
+    --kustomize deploy/overlays/local
+  kubectl rollout restart deployment/demo-service --namespace platform-lab
+  kubectl rollout status deployment/demo-service \
+    --namespace platform-lab \
+    --timeout=180s
+  BASE_URL="${BASE_URL:-http://127.0.0.1:8080}" ./scripts/smoke-test.sh
+elif [[ "${apply_mode}" != "none" ]]; then
+  echo "APPLY_MODE must be 'direct' or 'none'" >&2
+  exit 1
+fi
 
 echo "Platform Lab is running in context ${context}"
-echo "Demo Service: http://127.0.0.1:8080"
+if [[ "${apply_mode}" == "direct" ]]; then
+  echo "Demo Service: http://127.0.0.1:8080"
+fi

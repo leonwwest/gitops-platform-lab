@@ -2,7 +2,7 @@ PYTHON ?= .venv/bin/python
 PIP ?= .venv/bin/pip
 IMAGE ?= gitops-platform-lab-demo:local
 
-.PHONY: setup test lint format-check manifests verify run image container-verify local-up smoke local-down
+.PHONY: setup test lint format-check manifests verify run image container-verify local-up gitops-up gitops-status smoke local-down
 
 setup:
 	python3 -m venv .venv
@@ -33,6 +33,15 @@ container-verify:
 
 local-up:
 	IMAGE=$(IMAGE) ./scripts/bootstrap-local.sh
+
+gitops-up:
+	APPLY_MODE=none IMAGE=$(IMAGE) ./scripts/bootstrap-local.sh
+	./scripts/install-argocd.sh
+	./scripts/smoke-test.sh
+
+gitops-status:
+	kubectl get application/demo-service --namespace argocd
+	kubectl get deployment,pod,service --namespace platform-lab
 
 smoke:
 	./scripts/smoke-test.sh
