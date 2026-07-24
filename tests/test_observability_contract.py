@@ -20,7 +20,7 @@ def test_observability_chart_versions_are_explicitly_pinned() -> None:
         "PROMETHEUS_CHART_VERSION": "29.19.0",
         "GRAFANA_CHART_VERSION": "10.5.15",
         "LOKI_CHART_VERSION": "7.1.0",
-        "PROMTAIL_CHART_VERSION": "6.17.1",
+        "ALLOY_CHART_VERSION": "1.11.0",
         "JAEGER_CHART_VERSION": "4.11.1",
     }
 
@@ -34,8 +34,23 @@ def test_loki_is_an_explicit_single_binary_learning_deployment() -> None:
     assert values["loki"]["storage"]["type"] == "filesystem"
     assert values["loki"]["useTestSchema"] is True
     assert values["singleBinary"]["replicas"] == 1
+    assert values["singleBinary"]["extraVolumes"] == [{"name": "data", "emptyDir": {}}]
+    assert values["singleBinary"]["extraVolumeMounts"] == [
+        {"name": "data", "mountPath": "/var/loki"}
+    ]
     assert values["chunksCache"]["enabled"] is False
     assert values["resultsCache"]["enabled"] is False
+
+
+def test_alloy_collects_kubernetes_logs_without_host_privileges() -> None:
+    values = yaml.safe_load((OBSERVABILITY / "alloy-values.yaml").read_text())
+    config = values["alloy"]["configMap"]["content"]
+
+    assert values["controller"] == {"type": "deployment", "replicas": 1}
+    assert 'loki.source.kubernetes "pod_logs"' in config
+    assert 'loki.write "local"' in config
+    assert "http://loki.observability.svc.cluster.local:3100/loki/api/v1/push" in config
+    assert values["alloy"]["enableReporting"] is False
 
 
 def test_grafana_dashboard_covers_request_rate_errors_latency_and_logs() -> None:

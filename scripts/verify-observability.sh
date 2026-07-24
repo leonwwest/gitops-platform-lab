@@ -41,6 +41,10 @@ for duration in 5 10 20 40 80; do
   curl --fail --silent \
     "http://127.0.0.1:8080/api/v1/work?duration_ms=${duration}" >/dev/null
 done
+log_proof="alloy-proof-$(date +%s)"
+curl --fail --silent \
+  --header "x-request-id: ${log_proof}" \
+  "http://127.0.0.1:8080/api/v1/work?duration_ms=5" >/dev/null
 curl --silent \
   "http://127.0.0.1:8080/api/v1/work?duration_ms=5&fail=true" >/dev/null
 
@@ -53,7 +57,7 @@ prometheus_response="$(
 )"
 loki_response="$(
   curl --fail --silent --get \
-    --data-urlencode 'query={namespace="platform-lab",app="demo-service"}' \
+    --data-urlencode "query={namespace=\"platform-lab\",app=\"demo-service\"} |= \"${log_proof}\"" \
     --data-urlencode 'limit=20' \
     http://127.0.0.1:13100/loki/api/v1/query_range
 )"
@@ -67,7 +71,7 @@ grafana_response="$(
 [[ "${prometheus_response}" == *'"status":"success"'* ]]
 [[ "${prometheus_response}" == *'"result":['* ]]
 [[ "${loki_response}" == *'"status":"success"'* ]]
-[[ "${loki_response}" == *'"result":['* ]]
+[[ "${loki_response}" == *"${log_proof}"* ]]
 [[ "${jaeger_response}" == *"gitops-platform-lab-demo"* ]]
 [[ "${grafana_response}" == *'"database":"ok"'* ]]
 

@@ -43,12 +43,16 @@ helm upgrade --install loki grafana/loki \
   --wait \
   --timeout 10m
 
-helm upgrade --install promtail grafana/promtail \
+helm upgrade --install alloy grafana/alloy \
   --namespace observability \
-  --version "${PROMTAIL_CHART_VERSION}" \
-  --values observability/promtail-values.yaml \
+  --version "${ALLOY_CHART_VERSION}" \
+  --values observability/alloy-values.yaml \
   --wait \
   --timeout 10m
+
+if helm status promtail --namespace observability >/dev/null 2>&1; then
+  helm uninstall promtail --namespace observability
+fi
 
 helm upgrade --install jaeger jaegertracing/jaeger \
   --namespace observability \
