@@ -48,12 +48,12 @@ This distinguishes service degradation from a platform outage.
 
 ```bash
 kubectl -n platform-lab get deployment/demo-service -o yaml |
-  rg -n "FAILURE_MODE|image:|readyReplicas"
+  rg -n "APP_ENV|image:|readyReplicas"
 kubectl -n platform-lab logs deployment/demo-service --tail=20
 make failure-status
 ```
 
-Expected cause: `FAILURE_MODE=true` exists only in Running State from the controlled overlay.
+Expected cause: the controlled overlay changed `APP_ENV` from the Git value `local` to `failure` in Running State.
 
 ## Recover
 
@@ -65,7 +65,7 @@ Recovery reapplies the version-controlled Argo CD Application, restores automate
 
 - Application status is `Synced`
 - Application health is `Healthy`
-- `FAILURE_MODE` is absent
+- `APP_ENV` is restored to `local`
 - the full runtime smoke test passes
 
 ## Verify and close

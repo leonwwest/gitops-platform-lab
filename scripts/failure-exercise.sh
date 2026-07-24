@@ -25,13 +25,13 @@ wait_for_git_state() {
         --namespace argocd \
         --output=jsonpath='{.status.health.status}' 2>/dev/null || true
     )"
-    failure_mode="$(
+    app_environment="$(
       kubectl get deployment/demo-service \
         --namespace "${namespace}" \
-        --output=jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="FAILURE_MODE")].value}' \
+        --output=jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="APP_ENV")].value}' \
         2>/dev/null || true
     )"
-    if [[ "${sync}" == "Synced" && "${health}" == "Healthy" && -z "${failure_mode}" ]]; then
+    if [[ "${sync}" == "Synced" && "${health}" == "Healthy" && "${app_environment}" == "local" ]]; then
       return 0
     fi
     sleep 5
@@ -86,7 +86,13 @@ case "${action}" in
     application_status
     kubectl get deployment/demo-service \
       --namespace "${namespace}" \
-      --output=custom-columns=NAME:.metadata.name,READY:.status.readyReplicas,FAILURE_MODE:.spec.template.spec.containers[0].env[4].value
+      --output=custom-columns=NAME:.metadata.name,READY:.status.readyReplicas
+    app_environment="$(
+      kubectl get deployment/demo-service \
+        --namespace "${namespace}" \
+        --output=jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="APP_ENV")].value}'
+    )"
+    echo "APP_ENV=${app_environment:-unknown}"
     ;;
 
   *)

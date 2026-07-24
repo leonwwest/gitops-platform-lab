@@ -142,10 +142,6 @@ def current_trace_id() -> str | None:
     return format(span_context.trace_id, "032x")
 
 
-def environment_flag(name: str) -> bool:
-    return os.getenv(name, "").strip().lower() in {"1", "true", "yes", "on"}
-
-
 @app.get("/healthz", tags=["operations"])
 async def health() -> dict[str, str]:
     return {"status": "ok"}
@@ -171,7 +167,7 @@ async def synthetic_work(
     fail: bool = False,
 ) -> dict[str, str | int]:
     await asyncio.sleep(duration_ms / 1000)
-    if environment_flag("FAILURE_MODE"):
+    if os.getenv("APP_ENV") == "failure":
         raise HTTPException(status_code=503, detail="failure exercise is active")
     if fail:
         raise HTTPException(status_code=503, detail="synthetic failure requested")

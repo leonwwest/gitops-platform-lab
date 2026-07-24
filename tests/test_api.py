@@ -40,7 +40,7 @@ def test_synthetic_work_exposes_success_and_controlled_failure() -> None:
 
 
 def test_environment_can_enable_the_reversible_failure_exercise(monkeypatch) -> None:
-    monkeypatch.setenv("FAILURE_MODE", "true")
+    monkeypatch.setenv("APP_ENV", "failure")
 
     response = client.get("/api/v1/work?duration_ms=1")
 

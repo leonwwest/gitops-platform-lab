@@ -16,7 +16,7 @@ def test_failure_overlay_enables_only_the_controlled_work_failure() -> None:
         for entry in patch["spec"]["template"]["spec"]["containers"][0]["env"]
     }
 
-    assert environment == {"FAILURE_MODE": "true"}
+    assert environment == {"APP_ENV": "failure"}
 
 
 def test_failure_script_requires_confirmation_and_recovers_from_git() -> None:

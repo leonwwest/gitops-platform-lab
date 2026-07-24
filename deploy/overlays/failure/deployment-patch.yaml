@@ -9,5 +9,5 @@ spec:
       containers:
         - name: demo-service
           env:
-            - name: FAILURE_MODE
-              value: "true"
+            - name: APP_ENV
+              value: failure
