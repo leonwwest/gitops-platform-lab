@@ -39,6 +39,15 @@ def test_synthetic_work_exposes_success_and_controlled_failure() -> None:
     assert failure.json() == {"detail": "synthetic failure requested"}
 
 
+def test_environment_can_enable_the_reversible_failure_exercise(monkeypatch) -> None:
+    monkeypatch.setenv("FAILURE_MODE", "true")
+
+    response = client.get("/api/v1/work?duration_ms=1")
+
+    assert response.status_code == 503
+    assert response.json() == {"detail": "failure exercise is active"}
+
+
 def test_work_rejects_values_outside_the_safe_range() -> None:
     too_slow = client.get("/api/v1/work?duration_ms=2001")
 

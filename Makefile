@@ -2,7 +2,7 @@ PYTHON ?= .venv/bin/python
 PIP ?= .venv/bin/pip
 IMAGE ?= gitops-platform-lab-demo:local
 
-.PHONY: setup test lint format-check manifests verify run image container-verify local-up gitops-up gitops-status observability-up observability-verify observability-password smoke local-down
+.PHONY: setup test lint format-check manifests verify run image container-verify local-up gitops-up gitops-status observability-up observability-verify observability-password failure-inject failure-status failure-recover smoke local-down
 
 setup:
 	python3 -m venv .venv
@@ -19,6 +19,8 @@ format-check:
 
 manifests:
 	kubectl kustomize deploy/overlays/local >/dev/null
+	kubectl kustomize deploy/overlays/failure >/dev/null
+	kubectl kustomize deploy/overlays/production >/dev/null
 
 verify: lint format-check manifests test
 
@@ -52,6 +54,15 @@ observability-verify:
 observability-password:
 	kubectl get secret/grafana-admin --namespace observability --output=jsonpath='{.data.admin-password}' | base64 --decode
 	@echo
+
+failure-inject:
+	./scripts/failure-exercise.sh inject
+
+failure-status:
+	./scripts/failure-exercise.sh status
+
+failure-recover:
+	./scripts/failure-exercise.sh recover
 
 smoke:
 	./scripts/smoke-test.sh

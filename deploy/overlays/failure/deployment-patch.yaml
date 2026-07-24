@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-service
+  namespace: platform-lab
+spec:
+  template:
+    spec:
+      containers:
+        - name: demo-service
+          env:
+            - name: FAILURE_MODE
+              value: "true"

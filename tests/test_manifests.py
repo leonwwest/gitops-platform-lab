@@ -69,4 +69,4 @@ def test_local_overlay_declares_environment_and_image_version() -> None:
     assert container["image"] == "gitops-platform-lab-demo:local"
     assert container["imagePullPolicy"] == "IfNotPresent"
     assert environment["APP_ENV"] == "local"
-    assert environment["APP_VERSION"] == "local"
+    assert environment["APP_VERSION"] == "v0.1.0"
