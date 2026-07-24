@@ -2,7 +2,7 @@ PYTHON ?= .venv/bin/python
 PIP ?= .venv/bin/pip
 IMAGE ?= gitops-platform-lab-demo:local
 
-.PHONY: setup test lint format-check manifests verify run image container-verify local-up gitops-up gitops-status smoke local-down
+.PHONY: setup test lint format-check manifests verify run image container-verify local-up gitops-up gitops-status observability-up observability-verify observability-password smoke local-down
 
 setup:
 	python3 -m venv .venv
@@ -42,6 +42,16 @@ gitops-up:
 gitops-status:
 	kubectl get application/demo-service --namespace argocd
 	kubectl get deployment,pod,service --namespace platform-lab
+
+observability-up:
+	./scripts/install-observability.sh
+
+observability-verify:
+	./scripts/verify-observability.sh
+
+observability-password:
+	kubectl get secret/grafana-admin --namespace observability --output=jsonpath='{.data.admin-password}' | base64 --decode
+	@echo
 
 smoke:
 	./scripts/smoke-test.sh

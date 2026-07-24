@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-lab-dashboard
+  namespace: observability
+  labels:
+    grafana_dashboard: "1"
+data:
+  platform-lab.json: |
+    {
+      "annotations": {"list": []},
+      "editable": false,
+      "graphTooltip": 1,
+      "panels": [
+        {
+          "id": 1,
+          "title": "Request rate",
+          "type": "timeseries",
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum(rate(demo_http_requests_total[1m])) by (path)"
+            }
+          ],
+          "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0}
+        },
+        {
+          "id": 2,
+          "title": "5xx error rate",
+          "type": "timeseries",
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum(rate(demo_http_requests_total{status=~\"5..\"}[1m]))"
+            }
+          ],
+          "gridPos": {"h": 8, "w": 8, "x": 8, "y": 0}
+        },
+        {
+          "id": 3,
+          "title": "P95 latency",
+          "type": "timeseries",
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "histogram_quantile(0.95, sum(rate(demo_http_request_duration_seconds_bucket[5m])) by (le, path))"
+            }
+          ],
+          "gridPos": {"h": 8, "w": 8, "x": 16, "y": 0}
+        },
+        {
+          "id": 4,
+          "title": "Structured Demo Service logs",
+          "type": "logs",
+          "datasource": {"type": "loki", "uid": "loki"},
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "{namespace=\"platform-lab\", app=\"demo-service\"} | json"
+            }
+          ],
+          "gridPos": {"h": 10, "w": 24, "x": 0, "y": 8}
+        }
+      ],
+      "refresh": "5s",
+      "schemaVersion": 41,
+      "tags": ["gitops", "platform-lab"],
+      "templating": {"list": []},
+      "time": {"from": "now-15m", "to": "now"},
+      "timezone": "browser",
+      "title": "GitOps Platform Lab",
+      "uid": "gitops-platform-lab",
+      "version": 1
+    }
