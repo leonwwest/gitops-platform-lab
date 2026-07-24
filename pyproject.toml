@@ -1,0 +1,19 @@
+[project]
+name = "gitops-platform-lab"
+version = "0.1.0"
+description = "Demo Service for a local GitOps Platform Lab"
+requires-python = ">=3.12,<3.14"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.format]
+quote-style = "double"
