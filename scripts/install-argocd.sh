@@ -21,6 +21,7 @@ kubectl create namespace argocd \
 kubectl apply \
   --server-side \
   --field-manager=platform-lab-bootstrap \
+  --namespace=argocd \
   --filename="${manifest_url}"
 
 kubectl wait \
