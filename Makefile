@@ -2,7 +2,7 @@ PYTHON ?= .venv/bin/python
 PIP ?= .venv/bin/pip
 IMAGE ?= gitops-platform-lab-demo:local
 
-.PHONY: setup test lint format-check verify run
+.PHONY: setup test lint format-check verify run image container-verify
 
 setup:
 	python3 -m venv .venv
@@ -21,3 +21,9 @@ verify: lint format-check test
 
 run:
 	$(PYTHON) -m uvicorn app.main:app --host 0.0.0.0 --port 8080
+
+image:
+	docker build --tag $(IMAGE) .
+
+container-verify:
+	IMAGE=$(IMAGE) ./scripts/verify-container.sh
