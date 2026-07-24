@@ -2,7 +2,7 @@ PYTHON ?= .venv/bin/python
 PIP ?= .venv/bin/pip
 IMAGE ?= gitops-platform-lab-demo:local
 
-.PHONY: setup test lint format-check verify run image container-verify
+.PHONY: setup test lint format-check manifests verify run image container-verify local-up smoke local-down
 
 setup:
 	python3 -m venv .venv
@@ -17,7 +17,10 @@ lint:
 format-check:
 	$(PYTHON) -m ruff format --check .
 
-verify: lint format-check test
+manifests:
+	kubectl kustomize deploy/overlays/local >/dev/null
+
+verify: lint format-check manifests test
 
 run:
 	$(PYTHON) -m uvicorn app.main:app --host 0.0.0.0 --port 8080
@@ -27,3 +30,12 @@ image:
 
 container-verify:
 	IMAGE=$(IMAGE) ./scripts/verify-container.sh
+
+local-up:
+	IMAGE=$(IMAGE) ./scripts/bootstrap-local.sh
+
+smoke:
+	./scripts/smoke-test.sh
+
+local-down:
+	./scripts/cleanup-local.sh

@@ -29,6 +29,11 @@ jobs:
             requirements.txt
             requirements-dev.txt
 
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@c0c8b32d33a5244f1e5947304550403b63930415 # v4
+        with:
+          version: v1.33.3
+
       - name: Install dependencies
         run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
 
