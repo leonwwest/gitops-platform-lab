@@ -1,6 +1,7 @@
 # GitOps Platform Lab
 
 [![verify](https://github.com/leonwwest/gitops-platform-lab/actions/workflows/verify.yml/badge.svg)](https://github.com/leonwwest/gitops-platform-lab/actions/workflows/verify.yml)
+[![Security](https://github.com/leonwwest/gitops-platform-lab/actions/workflows/security.yml/badge.svg)](https://github.com/leonwwest/gitops-platform-lab/actions/workflows/security.yml)
 
 ![GitOps Platform Lab overview](assets/social-preview.svg)
 
@@ -16,7 +17,13 @@ The workload is deliberately small. The value of the project is the **operating 
 | How is it deployed? | Argo CD reconciles Git Desired State; CI validates but never imperatively deploys |
 | How is it operated? | Metrics, logs, traces, SLO alerts, dashboards and focused runbooks |
 | How is failure handled? | Guarded fault injection, Git-based recovery and a documented rebuild exercise |
-| How is it verified? | Fourteen tests plus Ruff, format, image and rendered-manifest checks |
+| How is it verified? | Fourteen tests, three rendered overlays, image build, CodeQL, dependency audit, Trivy and SPDX SBOM |
+
+### Real execution evidence
+
+This recording comes from the running FastAPI service and the repository's complete `make verify` path. The service response and verification results are observed output, not a generated product mock-up.
+
+![GitOps service and verification run](docs/demo.gif)
 
 ## What this demonstrates
 
