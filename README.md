@@ -2,9 +2,21 @@
 
 [![verify](https://github.com/leonwwest/gitops-platform-lab/actions/workflows/verify.yml/badge.svg)](https://github.com/leonwwest/gitops-platform-lab/actions/workflows/verify.yml)
 
+![GitOps Platform Lab overview](assets/social-preview.svg)
+
 A hands-on portfolio and learning environment for the complete path from tested code to container, Kubernetes Desired State, Argo CD reconciliation, observability and incident recovery.
 
 The workload is deliberately small. The value of the project is the **operating path around it**: repeatable verification, safe packaging, declarative delivery, Operational Signals and a reversible Failure Exercise.
+
+## Recruiter quick view
+
+| Question | Evidence in this repository |
+|---|---|
+| What is delivered? | A tested FastAPI service packaged as a non-root container and described with Kustomize |
+| How is it deployed? | Argo CD reconciles Git Desired State; CI validates but never imperatively deploys |
+| How is it operated? | Metrics, logs, traces, SLO alerts, dashboards and focused runbooks |
+| How is failure handled? | Guarded fault injection, Git-based recovery and a documented rebuild exercise |
+| How is it verified? | Fourteen tests plus Ruff, format, image and rendered-manifest checks |
 
 ## What this demonstrates
 
