@@ -16,6 +16,9 @@ The workload is deliberately small. The value of the project is the **operating 
 - Argo CD automated sync, pruning and self-healing from Git
 - Prometheus, Grafana, Loki, Grafana Alloy and Jaeger with pinned Helm chart versions
 - A guarded incident exercise and recovery by returning to Git Desired State
+- Production-like NetworkPolicy, PodDisruptionBudget and CPU autoscaling contracts
+- Inspectable availability SLO rules, alert ownership and operator runbooks
+- A disaster-recovery exercise that rebuilds from Git instead of applying mutable snapshots
 - GitHub Actions with read-only permissions and immutable action references
 - A locked Python dependency graph, digest-pinned base image and documented tested toolchain
 
@@ -110,6 +113,15 @@ make failure-recover
 
 Follow the [Failure Exercise runbook](docs/runbooks/failure-exercise.md). The guard prevents accidental injection; recovery restores the version-controlled healthy state through Argo CD.
 
+Capture recovery evidence or validate a rebuild with:
+
+```bash
+make recovery-snapshot
+make recovery-verify
+```
+
+See the [SLO alert runbook](docs/runbooks/slo-alerts.md) and the [Desired State recovery exercise](docs/runbooks/disaster-recovery.md).
+
 ### Cleanup
 
 ```bash
@@ -175,7 +187,7 @@ This is an honest learning environment, not a production platform:
 - k3d is a local Kubernetes distribution; it does not prove experience operating a production cluster.
 - Loki uses single-binary filesystem storage with a test schema; Prometheus and Grafana use ephemeral storage.
 - Jaeger uses the chart's local all-in-one configuration.
-- There is no external secret manager, ingress TLS, SSO, network isolation policy set, image signing or vulnerability gate.
+- There is no external secret manager, ingress TLS, SSO, image signing or vulnerability gate. The production-like overlay demonstrates namespace-scoped network isolation, but no real CNI enforcement is claimed.
 - The production-like overlay is illustrative and is not deployed to a public environment.
 - A real platform would add highly available storage, backups, SLOs and alerts, workload identity, policy enforcement, signed artifacts and environment-specific promotion.
 
