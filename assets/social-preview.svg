@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+  <rect width="1280" height="640" fill="#0b1020"/>
+  <rect width="12" height="640" fill="#8b5cf6"/>
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <text x="72" y="82" fill="#7d8ba3" font-size="18" font-weight="600" letter-spacing="2">LEON WESTERMEIR · ENGINEERING PORTFOLIO</text>
+    <text x="72" y="190" fill="#f4f7fb" font-size="58" font-weight="700">GitOps</text>
+    <text x="72" y="258" fill="#f4f7fb" font-size="58" font-weight="700">Platform Lab</text>
+    <text x="72" y="310" fill="#b9a4ff" font-size="24">Desired State · SLOs · Recovery</text>
+    <g fill="#15182e" stroke="#34345b"><rect x="72" y="382" width="118" height="42" rx="8"/><rect x="202" y="382" width="118" height="42" rx="8"/><rect x="332" y="382" width="126" height="42" rx="8"/></g>
+    <g fill="#d4d2ea" font-size="16" font-weight="600"><text x="94" y="409">KUBERNETES</text><text x="230" y="409">ARGO CD</text><text x="354" y="409">KUSTOMIZE</text></g>
+    <text x="72" y="540" fill="#7d8ba3" font-size="18">Git change → reconciliation → observable Running State</text>
+  </g>
+  <g transform="translate(694 144)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <g fill="#12182b" stroke="#373b67" stroke-width="2"><rect x="0" y="0" width="152" height="86" rx="12"/><rect x="202" y="0" width="152" height="86" rx="12"/><rect x="404" y="0" width="152" height="86" rx="12"/></g>
+    <g fill="#e8e7f2" font-size="18" font-weight="600"><text x="38" y="39">Git Desired</text><text x="58" y="63">State</text><text x="226" y="51">Reconcile</text><text x="428" y="39">Kubernetes</text><text x="447" y="63">cluster</text></g>
+    <g stroke="#8b5cf6" stroke-width="3" fill="none"><path d="M152 43h43"/><path d="M185 34l10 9-10 9"/><path d="M354 43h43"/><path d="M387 34l10 9-10 9"/></g>
+    <rect x="60" y="172" width="436" height="178" rx="14" fill="#10182b" stroke="#373b67" stroke-width="2"/>
+    <g fill="#7ee787"><circle cx="104" cy="220" r="8"/><circle cx="104" cy="263" r="8"/><circle cx="104" cy="306" r="8"/></g>
+    <g fill="#cfd1e6" font-size="18"><text x="128" y="226">Synced / Healthy</text><text x="128" y="269">SLO rules loaded</text><text x="128" y="312">Recovery verified</text></g>
+    <path d="M350 218h96M350 261h96M350 304h96" stroke="#56628b" stroke-width="8"/>
+  </g>
+</svg>
