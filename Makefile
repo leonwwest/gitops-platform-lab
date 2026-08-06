@@ -4,7 +4,7 @@ VENV_PYTHON ?= python3.12
 VENV_STAMP := .venv/.requirements-installed
 IMAGE ?= gitops-platform-lab-demo:local
 
-.PHONY: setup test lint format-check manifests verify run image container-verify local-up gitops-up platform-up gitops-status observability-up observability-verify observability-password failure-inject failure-status failure-recover smoke local-down
+.PHONY: setup test lint format-check manifests verify run image container-verify local-up gitops-up platform-up gitops-status observability-up observability-verify observability-password failure-inject failure-status failure-recover recovery-snapshot recovery-verify smoke local-down
 
 setup: $(VENV_STAMP)
 
@@ -80,6 +80,12 @@ failure-status:
 
 failure-recover:
 	./scripts/failure-exercise.sh recover
+
+recovery-snapshot:
+	./scripts/recovery-evidence.sh snapshot
+
+recovery-verify:
+	./scripts/recovery-evidence.sh verify
 
 smoke:
 	./scripts/smoke-test.sh

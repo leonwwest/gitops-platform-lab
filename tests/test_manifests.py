@@ -7,11 +7,22 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 OVERLAY = ROOT / "deploy" / "overlays" / "local"
+PRODUCTION_OVERLAY = ROOT / "deploy" / "overlays" / "production"
 
 
 def rendered_resources() -> list[dict]:
     result = subprocess.run(
         ["kubectl", "kustomize", str(OVERLAY)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return [document for document in yaml.safe_load_all(result.stdout) if document]
+
+
+def rendered_production_resources() -> list[dict]:
+    result = subprocess.run(
+        ["kubectl", "kustomize", str(PRODUCTION_OVERLAY)],
         check=True,
         capture_output=True,
         text=True,
@@ -70,3 +81,23 @@ def test_local_overlay_declares_environment_and_image_version() -> None:
     assert container["imagePullPolicy"] == "IfNotPresent"
     assert environment["APP_ENV"] == "local"
     assert environment["APP_VERSION"] == "v0.1.0"
+
+
+def test_production_overlay_declares_availability_controls() -> None:
+    resources = rendered_production_resources()
+    disruption_budget = resource(resources, "PodDisruptionBudget", "demo-service")
+    autoscaler = resource(resources, "HorizontalPodAutoscaler", "demo-service")
+
+    assert disruption_budget["spec"]["minAvailable"] == 1
+    assert autoscaler["spec"]["minReplicas"] == 2
+    assert autoscaler["spec"]["maxReplicas"] == 6
+    assert autoscaler["spec"]["metrics"][0]["resource"]["target"]["averageUtilization"] == 70
+
+
+def test_production_overlay_defaults_to_network_isolation() -> None:
+    policy = resource(rendered_production_resources(), "NetworkPolicy", "demo-service")
+
+    assert policy["spec"]["policyTypes"] == ["Ingress", "Egress"]
+    ingress_namespaces = policy["spec"]["ingress"][0]["from"]
+    assert {"podSelector": {}} in ingress_namespaces
+    assert policy["spec"]["egress"][0]["ports"][0] == {"protocol": "UDP", "port": 53}

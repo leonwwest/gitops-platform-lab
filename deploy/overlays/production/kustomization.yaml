@@ -3,6 +3,9 @@ kind: Kustomization
 
 resources:
   - ../../base
+  - horizontal-pod-autoscaler.yaml
+  - network-policy.yaml
+  - pod-disruption-budget.yaml
 
 images:
   - name: gitops-platform-lab-demo
