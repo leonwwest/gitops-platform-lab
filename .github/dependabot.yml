@@ -4,14 +4,31 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      # OpenTelemetry stable and beta packages must move as one release train.
+      opentelemetry:
+        patterns: ["opentelemetry-*", "wrapt"]
+      python-patch-updates:
+        patterns: ["*"]
+        exclude-patterns: ["opentelemetry-*", "wrapt"]
+        update-types: ["patch"]
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "weekly"
+    ignore:
+      # The tested runtime remains Python 3.12; only refresh its patch image.
+      - dependency-name: "python"
+        update-types:
+          - "version-update:semver-minor"
+          - "version-update:semver-major"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
     groups:
-      actions:
+      # Keep breaking action upgrades isolated for explicit review.
+      actions-minor-patch:
         patterns: ["*"]
+        update-types: ["minor", "patch"]
