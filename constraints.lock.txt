@@ -23,7 +23,7 @@ opentelemetry-proto==1.36.0
 opentelemetry-sdk==1.36.0
 opentelemetry-semantic-conventions==0.57b0
 opentelemetry-util-http==0.57b0
-packaging==26.2
+packaging==26.3
 pluggy==1.6.0
 prometheus_client==0.26.0
 protobuf==6.33.6
