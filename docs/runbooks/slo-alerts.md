@@ -2,10 +2,13 @@
 
 ## Service objective
 
-The lab models a 99.5% monthly availability objective for successful HTTP responses. The
-Prometheus rules are deliberately small enough to inspect: a five-minute error ratio above 5%
-is treated as fast error-budget consumption. This is an educational approximation, not a claim
-about a production service.
+The lab models a 99.5% monthly availability objective for successful HTTP responses. A page
+requires both a 5-minute burn rate above 14.4x and a 1-hour burn rate above 6x, reducing noise from
+a brief spike while still detecting sustained fast consumption. This is an educational model, not
+a claim about a production service.
+
+Run `make slo-exercise` to reproduce the synthetic healthy → breach → recovered sequence recorded
+in [`docs/evidence/slo-burn-rate.md`](../evidence/slo-burn-rate.md).
 
 ## First five minutes
 

@@ -1,0 +1,24 @@
+{
+  "objective": 0.995,
+  "thresholds": {
+    "short_window": 14.4,
+    "long_window": 6.0
+  },
+  "scenarios": [
+    {
+      "name": "healthy baseline",
+      "short": { "requests": 1000, "errors": 1 },
+      "long": { "requests": 12000, "errors": 24 }
+    },
+    {
+      "name": "controlled breach",
+      "short": { "requests": 1000, "errors": 100 },
+      "long": { "requests": 12000, "errors": 600 }
+    },
+    {
+      "name": "recovered desired state",
+      "short": { "requests": 1000, "errors": 2 },
+      "long": { "requests": 12000, "errors": 48 }
+    }
+  ]
+}

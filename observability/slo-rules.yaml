@@ -9,15 +9,27 @@ groups:
           sum(rate(demo_http_requests_total{status=~"5.."}[5m]))
           /
           clamp_min(sum(rate(demo_http_requests_total[5m])), 0.001)
+      - record: job:demo_http_errors:ratio_rate1h
+        expr: |
+          sum(rate(demo_http_requests_total{status=~"5.."}[1h]))
+          /
+          clamp_min(sum(rate(demo_http_requests_total[1h])), 0.001)
+      - record: job:demo_http_errors:burn_rate5m
+        expr: job:demo_http_errors:ratio_rate5m / 0.005
+      - record: job:demo_http_errors:burn_rate1h
+        expr: job:demo_http_errors:ratio_rate1h / 0.005
       - alert: DemoServiceFastErrorBudgetBurn
-        expr: job:demo_http_errors:ratio_rate5m > 0.05
-        for: 5m
+        expr: |
+          job:demo_http_errors:burn_rate5m > 14.4
+          and
+          job:demo_http_errors:burn_rate1h > 6
+        for: 2m
         labels:
           severity: page
           service: demo-service
           slo: availability
         annotations:
-          summary: Demo Service is consuming its availability error budget quickly
+          summary: Demo Service is burning its availability budget across short and long windows
           runbook_url: docs/runbooks/slo-alerts.md
       - alert: DemoServiceUnavailable
         expr: up{job=~".*demo-service.*"} == 0
