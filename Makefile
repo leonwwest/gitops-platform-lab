@@ -4,7 +4,7 @@ VENV_PYTHON ?= python3.12
 VENV_STAMP := .venv/.requirements-installed
 IMAGE ?= gitops-platform-lab-demo:local
 
-.PHONY: setup test lint format-check manifests verify run image container-verify local-up gitops-up platform-up gitops-status observability-up observability-verify observability-password failure-inject failure-status failure-recover recovery-snapshot recovery-verify smoke local-down
+.PHONY: setup test lint format-check manifests verify slo-exercise run image container-verify local-up gitops-up platform-up gitops-status observability-up observability-verify observability-password failure-inject failure-status failure-recover recovery-snapshot recovery-verify smoke local-down
 
 setup: $(VENV_STAMP)
 
@@ -34,6 +34,9 @@ manifests:
 	kubectl kustomize deploy/overlays/production >/dev/null
 
 verify: setup lint format-check manifests test
+
+slo-exercise:
+	$(PYTHON) -m tools.slo_burn_rate
 
 run:
 	$(PYTHON) -m uvicorn app.main:app --host 0.0.0.0 --port 8080
