@@ -36,6 +36,8 @@ The base owns the common Namespace, ServiceAccount, Deployment and Service. Over
 
 The Namespace enforces, audits and warns against the Kubernetes `restricted` Pod Security Standard at the tested Kubernetes version. The Deployment satisfies that admission boundary: it runs as UID/GID 10001, drops all Linux capabilities, prevents privilege escalation, uses a read-only root filesystem and does not mount a service-account token. The production-like overlay adds a namespace `ResourceQuota` and a container `LimitRange`; the existing workload requests and limits remain explicit while future containers cannot silently enter the Namespace without resource boundaries.
 
+Production-like replicas use two placement boundaries. Hostname spreading is a hard requirement with two minimum domains, preventing a nominally redundant workload from collapsing onto one node. Zone spreading is preferred so a cluster without zone labels can still schedule the workload while a multi-zone cluster distributes replicas when possible. This overlay is contract-tested and intentionally not used by the single-laptop local environment.
+
 ## Operational Signals
 
 ### Metrics

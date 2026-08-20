@@ -14,7 +14,7 @@ The workload stays deliberately small so the operating model remains inspectable
 | Capability | Inspectable evidence |
 |---|---|
 | GitOps delivery | Least-privilege [Argo CD AppProject](gitops/platform-lab-project.yaml) plus an [Application](gitops/demo-service.yaml) with automated sync, pruning and self-healing |
-| Verification | 23 HTTP, manifest and operational-contract tests; three Kustomize overlays; non-root container build |
+| Verification | 24 HTTP, manifest and operational-contract tests; three Kustomize overlays; non-root container build |
 | Workload policy | Enforced Kubernetes `restricted` Pod Security Standard plus tested network, disruption, autoscaling, namespace-budget and container-limit controls |
 | SLO operations | Runtime-loaded and API-verified 5m/1h [burn-rate rules](observability/slo-rules.yaml), a deterministic [breach/recovery exercise](docs/evidence/slo-burn-rate.md) and linked [operator runbook](docs/runbooks/slo-alerts.md) |
 | Recovery | Guarded [drift/self-healing](docs/runbooks/reconciliation-exercise.md) and failure exercises plus a [Desired State rebuild](docs/runbooks/disaster-recovery.md) that never restores mutable snapshots |
@@ -52,6 +52,7 @@ CI has no application-deployment step. Promotion is a reviewed Desired State cha
 - Reproducible reconciliation exercise that proves drift repair without a Git revision change
 - Argo CD project boundaries for the allowed Git source, cluster destination and Kubernetes resource kinds
 - Production-like availability and network-isolation contracts
+- Host-enforced and zone-aware topology spreading for production-like replicas
 - Production-like `ResourceQuota` and `LimitRange` guardrails for namespace capacity and container defaults
 - Namespace-level enforcement, audit and warnings for the Kubernetes `restricted` Pod Security Standard
 - Guarded failure exercise with observable HTTP 503 behaviour and Git-based recovery
