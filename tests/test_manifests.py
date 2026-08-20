@@ -104,6 +104,27 @@ def test_production_overlay_declares_availability_controls() -> None:
     assert autoscaler["spec"]["metrics"][0]["resource"]["target"]["averageUtilization"] == 70
 
 
+def test_production_replicas_require_host_spread_and_prefer_zone_spread() -> None:
+    deployment = resource(rendered_production_resources(), "Deployment", "demo-service")
+    spread_constraints = deployment["spec"]["template"]["spec"]["topologySpreadConstraints"]
+
+    assert spread_constraints == [
+        {
+            "maxSkew": 1,
+            "minDomains": 2,
+            "topologyKey": "kubernetes.io/hostname",
+            "whenUnsatisfiable": "DoNotSchedule",
+            "labelSelector": {"matchLabels": {"app.kubernetes.io/name": "demo-service"}},
+        },
+        {
+            "maxSkew": 1,
+            "topologyKey": "topology.kubernetes.io/zone",
+            "whenUnsatisfiable": "ScheduleAnyway",
+            "labelSelector": {"matchLabels": {"app.kubernetes.io/name": "demo-service"}},
+        },
+    ]
+
+
 def test_production_overlay_bounds_namespace_and_container_resources() -> None:
     resources = rendered_production_resources()
     quota = resource(resources, "ResourceQuota", "platform-lab-budget")
