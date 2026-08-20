@@ -56,3 +56,13 @@ def test_recovery_evidence_never_applies_a_running_state_snapshot() -> None:
     assert "kubectl get" in script
     assert "kubectl kustomize" in script
     assert "kubectl apply" not in script
+
+
+def test_reconciliation_exercise_proves_self_healing_without_imperative_recovery() -> None:
+    script = (ROOT / "scripts" / "reconciliation-exercise.sh").read_text()
+
+    assert "CONFIRM_RECONCILIATION_EXERCISE" in script
+    assert "kubectl scale" in script
+    assert "argocd.argoproj.io/refresh=hard" in script
+    assert 'if [[ "${after_revision}" != "${before_revision}" ]]' in script
+    assert "kubectl apply" not in script

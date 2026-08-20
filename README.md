@@ -14,10 +14,10 @@ The workload stays deliberately small so the operating model remains inspectable
 | Capability | Inspectable evidence |
 |---|---|
 | GitOps delivery | Least-privilege [Argo CD AppProject](gitops/platform-lab-project.yaml) plus an [Application](gitops/demo-service.yaml) with automated sync, pruning and self-healing |
-| Verification | 20 HTTP, manifest and operational-contract tests; three Kustomize overlays; non-root container build |
+| Verification | 21 HTTP, manifest and operational-contract tests; three Kustomize overlays; non-root container build |
 | Workload policy | Enforced Kubernetes `restricted` Pod Security Standard plus tested `NetworkPolicy`, `PodDisruptionBudget`, `HorizontalPodAutoscaler`, probes, resources and security contexts |
 | SLO operations | Tested 5m/1h [burn-rate rules](observability/slo-rules.yaml), a deterministic [breach/recovery exercise](docs/evidence/slo-burn-rate.md) and linked [operator runbook](docs/runbooks/slo-alerts.md) |
-| Recovery | Guarded failure injection, Git-based restoration and a [Desired State recovery exercise](docs/runbooks/disaster-recovery.md) that rebuilds instead of applying mutable snapshots |
+| Recovery | Guarded [drift/self-healing](docs/runbooks/reconciliation-exercise.md) and failure exercises plus a [Desired State rebuild](docs/runbooks/disaster-recovery.md) that never restores mutable snapshots |
 | Supply chain | Read-only GitHub Actions, SHA-pinned actions, locked Python dependencies, CodeQL, dependency audit, Trivy and SPDX SBOM |
 
 ### Recorded execution
@@ -49,6 +49,7 @@ CI has no application-deployment step. Promotion is a reviewed Desired State cha
 - Kustomize base plus local, failure and production-like overlays
 - Local k3d platform with Argo CD, Prometheus, Grafana, Loki, Alloy and Jaeger
 - Reconciliation with automated sync, pruning and drift self-healing
+- Reproducible reconciliation exercise that proves drift repair without a Git revision change
 - Argo CD project boundaries for the allowed Git source, cluster destination and Kubernetes resource kinds
 - Production-like availability and network-isolation contracts
 - Namespace-level enforcement, audit and warnings for the Kubernetes `restricted` Pod Security Standard
@@ -86,6 +87,7 @@ For focused operations, use the linked guides:
 
 - [Architecture and data flow](docs/architecture.md)
 - [Failure Exercise runbook](docs/runbooks/failure-exercise.md)
+- [Desired State reconciliation exercise](docs/runbooks/reconciliation-exercise.md)
 - [SLO alert runbook](docs/runbooks/slo-alerts.md)
 - [Desired State recovery exercise](docs/runbooks/disaster-recovery.md)
 - [Interview cheat sheet](docs/interview-cheat-sheet.md)
