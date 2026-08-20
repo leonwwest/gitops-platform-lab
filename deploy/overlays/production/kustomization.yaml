@@ -4,8 +4,10 @@ kind: Kustomization
 resources:
   - ../../base
   - horizontal-pod-autoscaler.yaml
+  - limit-range.yaml
   - network-policy.yaml
   - pod-disruption-budget.yaml
+  - resource-quota.yaml
 
 images:
   - name: gitops-platform-lab-demo

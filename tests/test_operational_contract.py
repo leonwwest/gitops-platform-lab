@@ -19,8 +19,10 @@ def test_argocd_project_scopes_source_destination_and_resource_kinds() -> None:
     assert {entry["kind"] for entry in spec["namespaceResourceWhitelist"]} == {
         "Deployment",
         "HorizontalPodAutoscaler",
+        "LimitRange",
         "NetworkPolicy",
         "PodDisruptionBudget",
+        "ResourceQuota",
         "Service",
         "ServiceAccount",
     }
