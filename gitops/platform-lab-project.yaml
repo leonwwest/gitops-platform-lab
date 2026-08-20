@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: platform-lab
+  namespace: argocd
+spec:
+  description: Least-privilege boundary for the GitOps Platform Lab
+  sourceRepos:
+    - https://github.com/leonwwest/gitops-platform-lab.git
+  destinations:
+    - namespace: platform-lab
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: Service
+    - group: ""
+      kind: ServiceAccount
+    - group: apps
+      kind: Deployment
+    - group: autoscaling
+      kind: HorizontalPodAutoscaler
+    - group: networking.k8s.io
+      kind: NetworkPolicy
+    - group: policy
+      kind: PodDisruptionBudget
+  orphanedResources:
+    warn: true

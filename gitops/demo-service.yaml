@@ -6,7 +6,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
+  project: platform-lab
   source:
     repoURL: https://github.com/leonwwest/gitops-platform-lab.git
     targetRevision: main

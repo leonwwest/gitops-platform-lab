@@ -5,11 +5,14 @@
 1. A change enters Git.
 2. GitHub Actions runs `make verify` and constructs the container image.
 3. The Kustomize overlay remains the Desired State.
-4. Argo CD compares Git with the Running State and reconciles differences.
-5. Kubernetes uses readiness and liveness probes to decide whether the Pod can receive traffic and whether it should be restarted.
-6. The runtime emits metrics, logs and traces for diagnosis.
+4. The Argo CD AppProject admits only the repository, destination and resource kinds owned by the Platform Lab.
+5. Argo CD compares Git with the Running State and reconciles differences.
+6. Kubernetes uses readiness and liveness probes to decide whether the Pod can receive traffic and whether it should be restarted.
+7. The runtime emits metrics, logs and traces for diagnosis.
 
 CI deliberately does not run `kubectl apply` for the Demo Service. A green build proves that a candidate passed its checks; it does not authorize an imperative deployment. Promotion is a reviewed change to the Desired State, and Argo CD performs reconciliation.
+
+The `platform-lab` AppProject is the GitOps authorization boundary. It accepts only this repository, the `platform-lab` Namespace on the in-cluster API server and the resource kinds used by the three overlays. Orphan detection remains enabled so resources no longer owned by the Desired State are visible to an operator.
 
 ## Test seams
 

@@ -13,8 +13,8 @@ The workload stays deliberately small so the operating model remains inspectable
 
 | Capability | Inspectable evidence |
 |---|---|
-| GitOps delivery | [Argo CD Application](gitops/demo-service.yaml) with automated sync, pruning and self-healing; [deployment-boundary ADR](docs/adr/0001-git-is-the-deployment-boundary.md) |
-| Verification | 19 HTTP, manifest and operational-contract tests; three Kustomize overlays; non-root container build |
+| GitOps delivery | Least-privilege [Argo CD AppProject](gitops/platform-lab-project.yaml) plus an [Application](gitops/demo-service.yaml) with automated sync, pruning and self-healing |
+| Verification | 20 HTTP, manifest and operational-contract tests; three Kustomize overlays; non-root container build |
 | Workload policy | Enforced Kubernetes `restricted` Pod Security Standard plus tested `NetworkPolicy`, `PodDisruptionBudget`, `HorizontalPodAutoscaler`, probes, resources and security contexts |
 | SLO operations | Tested 5m/1h [burn-rate rules](observability/slo-rules.yaml), a deterministic [breach/recovery exercise](docs/evidence/slo-burn-rate.md) and linked [operator runbook](docs/runbooks/slo-alerts.md) |
 | Recovery | Guarded failure injection, Git-based restoration and a [Desired State recovery exercise](docs/runbooks/disaster-recovery.md) that rebuilds instead of applying mutable snapshots |
@@ -49,6 +49,7 @@ CI has no application-deployment step. Promotion is a reviewed Desired State cha
 - Kustomize base plus local, failure and production-like overlays
 - Local k3d platform with Argo CD, Prometheus, Grafana, Loki, Alloy and Jaeger
 - Reconciliation with automated sync, pruning and drift self-healing
+- Argo CD project boundaries for the allowed Git source, cluster destination and Kubernetes resource kinds
 - Production-like availability and network-isolation contracts
 - Namespace-level enforcement, audit and warnings for the Kubernetes `restricted` Pod Security Standard
 - Guarded failure exercise with observable HTTP 503 behaviour and Git-based recovery
@@ -96,7 +97,7 @@ app/                    FastAPI Demo Service
 tests/                  HTTP, manifest and operational-contract tests
 deploy/base/            Reusable Kubernetes Desired State
 deploy/overlays/        Local, failure and production-like variants
-gitops/                 Argo CD Application
+gitops/                 Argo CD AppProject and Application
 observability/          Pinned values, SLO rules and Grafana dashboard
 scripts/                Bootstrap, verification and recovery automation
 docs/                   Architecture, ADR, runbooks and interview notes
