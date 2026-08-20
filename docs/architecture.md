@@ -40,7 +40,7 @@ The Namespace enforces, audits and warns against the Kubernetes `restricted` Pod
 
 ### Metrics
 
-The Demo Service exports request count and request-duration histograms. Prometheus discovers the annotated Pod. Grafana visualises request rate, 5xx rate and P95 latency.
+The Demo Service exports request count and request-duration histograms. Prometheus discovers the annotated Pod and loads the version-controlled SLO recording and alerting rules from a dedicated ConfigMap. The runtime verification checks the Prometheus rules API, not only the source YAML. Grafana visualises request rate, 5xx rate and P95 latency.
 
 ### Logs
 

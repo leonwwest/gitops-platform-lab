@@ -24,6 +24,13 @@ if ! kubectl get secret/grafana-admin --namespace observability >/dev/null 2>&1;
     --from-literal="admin-password=${grafana_password}"
 fi
 
+kubectl create configmap platform-lab-slo-rules \
+  --namespace observability \
+  --from-file=slo-rules.yaml=observability/slo-rules.yaml \
+  --dry-run=client \
+  --output=yaml |
+  kubectl apply --server-side --field-manager=platform-lab-observability --filename=-
+
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts \
   --force-update
 helm repo add grafana https://grafana.github.io/helm-charts --force-update

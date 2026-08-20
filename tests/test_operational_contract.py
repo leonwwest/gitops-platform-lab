@@ -50,6 +50,26 @@ def test_slo_budget_alert_requires_short_and_long_window_burn() -> None:
     assert "ratio_rate1h / 0.005" in rules
 
 
+def test_prometheus_runtime_loads_the_version_controlled_slo_rules() -> None:
+    values = yaml.safe_load((ROOT / "observability" / "prometheus-values.yaml").read_text())
+    installer = (ROOT / "scripts" / "install-observability.sh").read_text()
+    verifier = (ROOT / "scripts" / "verify-observability.sh").read_text()
+
+    rule_path = "/etc/config/platform-lab-rules/*.yaml"
+    assert rule_path in values["serverFiles"]["prometheus.yml"]["rule_files"]
+    assert values["server"]["extraConfigmapMounts"][0]["configMap"] == ("platform-lab-slo-rules")
+    assert (
+        values["configmapReload"]["prometheus"]["extraConfigmapMounts"][0]["configMap"]
+        == "platform-lab-slo-rules"
+    )
+    assert values["configmapReload"]["prometheus"]["extraVolumeDirs"] == [
+        "/etc/config/platform-lab-rules"
+    ]
+    assert "--from-file=slo-rules.yaml=observability/slo-rules.yaml" in installer
+    assert "/api/v1/rules" in verifier
+    assert "DemoServiceFastErrorBudgetBurn" in verifier
+
+
 def test_recovery_evidence_never_applies_a_running_state_snapshot() -> None:
     script = (ROOT / "scripts" / "recovery-evidence.sh").read_text()
 

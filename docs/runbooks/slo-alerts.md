@@ -1,5 +1,7 @@
 # SLO alert runbook
 
+The rules are loaded from `observability/slo-rules.yaml` into Prometheus during `make observability-up`. Run `make observability-verify` to confirm that Prometheus reports the rule group and both alerts through its runtime API.
+
 ## Service objective
 
 The lab models a 99.5% monthly availability objective for successful HTTP responses. A page

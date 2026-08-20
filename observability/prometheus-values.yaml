@@ -10,10 +10,25 @@ prometheus-node-exporter:
 prometheus-pushgateway:
   enabled: false
 
+configmapReload:
+  prometheus:
+    extraVolumeDirs:
+      - /etc/config/platform-lab-rules
+    extraConfigmapMounts:
+      - name: platform-lab-slo-rules
+        mountPath: /etc/config/platform-lab-rules
+        configMap: platform-lab-slo-rules
+        readOnly: true
+
 server:
   retention: 2h
   persistentVolume:
     enabled: false
+  extraConfigmapMounts:
+    - name: platform-lab-slo-rules
+      mountPath: /etc/config/platform-lab-rules
+      configMap: platform-lab-slo-rules
+      readOnly: true
   resources:
     requests:
       cpu: 100m
@@ -21,3 +36,10 @@ server:
     limits:
       cpu: 500m
       memory: 512Mi
+
+serverFiles:
+  prometheus.yml:
+    rule_files:
+      - /etc/config/recording_rules.yml
+      - /etc/config/alerting_rules.yml
+      - /etc/config/platform-lab-rules/*.yaml
