@@ -55,6 +55,9 @@ prometheus_response="$(
     --data-urlencode 'query=sum(demo_http_requests_total)' \
     http://127.0.0.1:19090/api/v1/query
 )"
+prometheus_rules_response="$(
+  curl --fail --silent http://127.0.0.1:19090/api/v1/rules
+)"
 loki_response="$(
   curl --fail --silent --get \
     --data-urlencode "query={namespace=\"platform-lab\",app=\"demo-service\"} |= \"${log_proof}\"" \
@@ -70,9 +73,12 @@ grafana_response="$(
 
 [[ "${prometheus_response}" == *'"status":"success"'* ]]
 [[ "${prometheus_response}" == *'"result":['* ]]
+[[ "${prometheus_rules_response}" == *'"name":"demo-service-slo"'* ]]
+[[ "${prometheus_rules_response}" == *'"name":"DemoServiceFastErrorBudgetBurn"'* ]]
+[[ "${prometheus_rules_response}" == *'"name":"DemoServiceUnavailable"'* ]]
 [[ "${loki_response}" == *'"status":"success"'* ]]
 [[ "${loki_response}" == *"${log_proof}"* ]]
 [[ "${jaeger_response}" == *"gitops-platform-lab-demo"* ]]
 [[ "${grafana_response}" == *'"database":"ok"'* ]]
 
-echo "observability verification passed: metrics, logs, traces and Grafana health"
+echo "observability verification passed: metrics, SLO rules, logs, traces and Grafana health"
