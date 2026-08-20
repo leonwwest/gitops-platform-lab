@@ -21,6 +21,7 @@ The project tests the highest practical public boundaries:
 - `make verify` checks HTTP behaviour and the fully rendered Kustomize resources.
 - `make container-verify` checks the running container's identity and HTTP surface.
 - `scripts/smoke-test.sh` checks the externally reachable service in k3d.
+- `scripts/reconciliation-exercise.sh` introduces replica drift and proves self-healing at the same Git revision.
 - `make observability-verify` queries Prometheus, Loki, Jaeger and Grafana over their HTTP APIs.
 
 Tests do not mock internal helpers or assert private implementation details.
