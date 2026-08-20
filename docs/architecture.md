@@ -32,9 +32,9 @@ The base owns the common Namespace, ServiceAccount, Deployment and Service. Over
 
 - `local`: local image, NodePort and local OTLP endpoint
 - `failure`: the local state plus the controlled failure flag
-- `production`: two replicas and an illustrative registry image
+- `production`: two replicas, an illustrative registry image and namespace-level resource governance
 
-The Namespace enforces, audits and warns against the Kubernetes `restricted` Pod Security Standard at the tested Kubernetes version. The Deployment satisfies that admission boundary: it runs as UID/GID 10001, drops all Linux capabilities, prevents privilege escalation, uses a read-only root filesystem and does not mount a service-account token.
+The Namespace enforces, audits and warns against the Kubernetes `restricted` Pod Security Standard at the tested Kubernetes version. The Deployment satisfies that admission boundary: it runs as UID/GID 10001, drops all Linux capabilities, prevents privilege escalation, uses a read-only root filesystem and does not mount a service-account token. The production-like overlay adds a namespace `ResourceQuota` and a container `LimitRange`; the existing workload requests and limits remain explicit while future containers cannot silently enter the Namespace without resource boundaries.
 
 ## Operational Signals
 

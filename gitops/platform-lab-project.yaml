@@ -15,6 +15,10 @@ spec:
       kind: Namespace
   namespaceResourceWhitelist:
     - group: ""
+      kind: LimitRange
+    - group: ""
+      kind: ResourceQuota
+    - group: ""
       kind: Service
     - group: ""
       kind: ServiceAccount

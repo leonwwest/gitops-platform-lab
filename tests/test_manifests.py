@@ -104,6 +104,26 @@ def test_production_overlay_declares_availability_controls() -> None:
     assert autoscaler["spec"]["metrics"][0]["resource"]["target"]["averageUtilization"] == 70
 
 
+def test_production_overlay_bounds_namespace_and_container_resources() -> None:
+    resources = rendered_production_resources()
+    quota = resource(resources, "ResourceQuota", "platform-lab-budget")
+    limit_range = resource(resources, "LimitRange", "platform-lab-container-defaults")
+    container_limits = limit_range["spec"]["limits"][0]
+
+    assert quota["spec"]["hard"] == {
+        "requests.cpu": "2",
+        "requests.memory": "2Gi",
+        "limits.cpu": "4",
+        "limits.memory": "4Gi",
+        "pods": "10",
+        "services": "5",
+    }
+    assert container_limits["type"] == "Container"
+    assert container_limits["defaultRequest"] == {"cpu": "100m", "memory": "128Mi"}
+    assert container_limits["default"] == {"cpu": "500m", "memory": "256Mi"}
+    assert container_limits["max"] == {"cpu": "1", "memory": "512Mi"}
+
+
 def test_production_overlay_defaults_to_network_isolation() -> None:
     policy = resource(rendered_production_resources(), "NetworkPolicy", "demo-service")
 
