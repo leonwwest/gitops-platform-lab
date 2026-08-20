@@ -5,6 +5,28 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_argocd_project_scopes_source_destination_and_resource_kinds() -> None:
+    project = yaml.safe_load((ROOT / "gitops" / "platform-lab-project.yaml").read_text())
+    application = yaml.safe_load((ROOT / "gitops" / "demo-service.yaml").read_text())
+    spec = project["spec"]
+
+    assert application["spec"]["project"] == project["metadata"]["name"]
+    assert spec["sourceRepos"] == ["https://github.com/leonwwest/gitops-platform-lab.git"]
+    assert spec["destinations"] == [
+        {"namespace": "platform-lab", "server": "https://kubernetes.default.svc"}
+    ]
+    assert spec["clusterResourceWhitelist"] == [{"group": "", "kind": "Namespace"}]
+    assert {entry["kind"] for entry in spec["namespaceResourceWhitelist"]} == {
+        "Deployment",
+        "HorizontalPodAutoscaler",
+        "NetworkPolicy",
+        "PodDisruptionBudget",
+        "Service",
+        "ServiceAccount",
+    }
+    assert spec["orphanedResources"]["warn"] is True
+
+
 def test_slo_alerts_have_ownership_severity_and_runbooks() -> None:
     groups = yaml.safe_load((ROOT / "observability" / "slo-rules.yaml").read_text())["groups"]
     alerts = [rule for group in groups for rule in group["rules"] if "alert" in rule]

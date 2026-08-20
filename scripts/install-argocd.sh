@@ -34,6 +34,7 @@ kubectl rollout status statefulset/argocd-application-controller \
   --namespace argocd \
   --timeout=300s
 
+kubectl apply --filename gitops/platform-lab-project.yaml
 kubectl apply --filename gitops/demo-service.yaml
 
 deadline=$((SECONDS + 300))
