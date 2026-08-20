@@ -30,7 +30,7 @@ The base owns the common Namespace, ServiceAccount, Deployment and Service. Over
 - `failure`: the local state plus the controlled failure flag
 - `production`: two replicas and an illustrative registry image
 
-The Deployment runs as UID/GID 10001, drops all Linux capabilities, prevents privilege escalation, uses a read-only root filesystem and does not mount a service-account token.
+The Namespace enforces, audits and warns against the Kubernetes `restricted` Pod Security Standard at the tested Kubernetes version. The Deployment satisfies that admission boundary: it runs as UID/GID 10001, drops all Linux capabilities, prevents privilege escalation, uses a read-only root filesystem and does not mount a service-account token.
 
 ## Operational Signals
 
