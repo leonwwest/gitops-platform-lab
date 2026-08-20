@@ -51,6 +51,16 @@ def test_local_overlay_renders_a_deployable_public_service() -> None:
     assert service["spec"]["ports"][0]["nodePort"] == 30080
 
 
+def test_namespace_enforces_the_restricted_pod_security_standard() -> None:
+    namespace = resource(rendered_resources(), "Namespace", "platform-lab")
+    labels = namespace["metadata"]["labels"]
+
+    assert labels["pod-security.kubernetes.io/enforce"] == "restricted"
+    assert labels["pod-security.kubernetes.io/enforce-version"] == "v1.33"
+    assert labels["pod-security.kubernetes.io/audit"] == "restricted"
+    assert labels["pod-security.kubernetes.io/warn"] == "restricted"
+
+
 def test_deployment_has_runtime_safety_and_operability_controls() -> None:
     deployment = resource(rendered_resources(), "Deployment", "demo-service")
     pod_spec = deployment["spec"]["template"]["spec"]
